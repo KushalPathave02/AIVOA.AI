@@ -146,6 +146,32 @@ Short questions go to the AI chat (e.g. "what evidence is missing for RCA-2026-0
 
 ---
 
+## Live Deployment (Render)
+
+| Service | URL |
+|---|---|
+| **Frontend** | https://pharmaroot-web.onrender.com |
+| **Backend API** | https://pharmaroot-api.onrender.com |
+| **Database** | Render PostgreSQL (auto-provisioned) |
+
+**Live login:** `demo@pharmaroot.ai` / `Demo@1234` (or sign up at `/signup`)
+
+### Render architecture
+
+- `render.yaml` blueprint defines 3 services: `pharmaroot-api` (FastAPI), `pharmaroot-web` (React static), `pharmaroot-db` (Postgres)
+- Backend env vars: `DATABASE_URL` (auto-linked), `GROQ_API_KEY`, `GROQ_MODEL`, `SECRET_KEY`, `UPLOAD_DIR=/tmp/uploads`
+- Frontend env var: `VITE_API_URL=https://pharmaroot-api.onrender.com`
+- Python pinned to 3.12 via `runtime.txt`; DB driver is `psycopg` v3
+
+### Troubleshooting
+
+- **AI extraction changes not visible?** Reload the website once (`Cmd+R`) — Redux state refreshes and the extracted data will appear.
+- **AI analysis takes time** — the full pipeline (extract → RCA → missing evidence → CAPA) makes multiple LLM calls and can take **2–4 minutes**. Wait for the spinner to finish; do not close the panel.
+- **First request slow?** Render free tier sleeps after inactivity — the first request can take ~30 seconds to wake up.
+- **Uploaded files lost on redeploy?** Render's filesystem is ephemeral — evidence files stored in `/tmp/uploads` are temporary. Database records persist in Postgres.
+
+---
+
 ## Notes
 
 - Groq free tier limits output to ~1000 tokens/request — full analysis takes 2–4 minutes due to rate-limit retries.
